@@ -25,10 +25,10 @@ public class DBUtil {
     private static User getUser(String queryAddition) throws SQLException {
         var mediator = initializeMediator();
         var resultSet = mediator.executeQuery("SELECT * FROM \"Users\" WHERE " + queryAddition);
+        destroyMediator(mediator);
         if(resultSet == null) throw new SQLException("User not found");
         resultSet.next();
-        User user = parseUser(resultSet);
-        return user;
+        return parseUser(resultSet);
     }
 
     public static User getUserById(Integer id) throws SQLException {
