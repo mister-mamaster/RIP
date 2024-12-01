@@ -8,7 +8,7 @@ public class TextMessage implements TextResponse {
     private String message;
 
     @Override
-    public void getResponse(OutputStream out) throws IOException {
+    public void writeResponse(OutputStream out) throws IOException {
         out.write(message.getBytes());
     }
 

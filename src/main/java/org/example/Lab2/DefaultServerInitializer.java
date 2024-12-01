@@ -22,14 +22,13 @@ public class DefaultServerInitializer implements ServerInitializer {
             try {
                 response.formResponse("ping ".repeat((Integer) ParamsParser.parse(t.getRequestURI().getQuery()).get("number")));
             } catch (NullPointerException e) {
+                response.formResponse("ping");
                 e.printStackTrace();
             }
             t.sendResponseHeaders(200, response.getTextOfResponse().length());
             OutputStream os = t.getResponseBody();
-            response.getResponse(os);
+            response.writeResponse(os);
             os.close();
         }
     }
-
-
 }
