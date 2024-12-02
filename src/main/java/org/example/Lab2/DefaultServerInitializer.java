@@ -20,7 +20,7 @@ public class DefaultServerInitializer implements ServerInitializer {
         public void handle(HttpExchange t) throws IOException {
             TextMessage response = new TextMessage();
             try {
-                response.formResponse("ping ".repeat((Integer) ParamsParser.parse(t).get("number")));
+                response.formResponse("ping ".repeat((Integer) new ParamsParser().parse(t).get("number")));
             } catch (NullPointerException e) {
                 response.formResponse("ping");
                 e.printStackTrace();

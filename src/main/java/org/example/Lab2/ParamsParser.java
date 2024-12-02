@@ -7,8 +7,9 @@ import java.util.Map;
 import com.sun.net.httpserver.HttpExchange;
 import org.apache.commons.lang3.math.NumberUtils;
 
-public class ParamsParser {
-    public static Map<String, Object> parse(String rawString) {
+public class ParamsParser implements Parser<Map<String, Object>, String>{
+    @Override
+    public Map<String, Object> parse(String rawString) {
         String[] params = rawString.split("&");
         Map<String, Object> paramsMap = new HashMap<>();
         Arrays.stream(params).forEach((param) -> {
@@ -18,7 +19,7 @@ public class ParamsParser {
         return paramsMap;
     }
 
-    public static Map<String, Object> parse(HttpExchange he) {
+    public Map<String, Object> parse(HttpExchange he) {
         return parse(he.getRequestURI().getQuery());
     }
 }
