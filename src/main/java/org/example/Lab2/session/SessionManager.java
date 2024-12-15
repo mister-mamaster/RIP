@@ -29,4 +29,13 @@ public class SessionManager {
         }
         return new String(array, StandardCharsets.UTF_8);
     }
+
+    public void deleteSession(String key) {
+        for (int i = 0; i < sessions.size(); i++) {
+            if(sessions.get(i).checkId(key)) {
+                this.sessions.remove(i);
+                break;
+            }
+        }
+    }
 }
