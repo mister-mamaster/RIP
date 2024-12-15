@@ -10,7 +10,10 @@ import org.example.Lab2.parsers.RegistrationParser;
 import org.example.Lab2.session.SessionManager;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Objects;
 
 public class ThirdLabInitializer extends DefaultServerInitializer {
 
@@ -30,7 +33,9 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
             var userData = new RegistrationParser().parse(t.getRequestBody());
             var nUser = new User(userData.username, userData.email, userData.password, userData.login);
             nUser.save();
-            t.sendResponseHeaders(200, 0);
+            t.sendResponseHeaders(201, 0);
+            OutputStream os = t.getResponseBody();
+            os.close();
         }
     }
 
@@ -45,12 +50,16 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
         @Override
         public void handle(HttpExchange t) throws IOException {
             try {
-                var User = DBUtil.getUserByLogin(new AuthParser().parse(t.getRequestBody()).login);
-                var session = sessionManager.createSession().getId();
-                t.sendResponseHeaders(201, 0);
-                t.setAttribute("SessionId", session);
+                RegistrationData data = new AuthParser().parse(t.getRequestBody());
+                var user = DBUtil.getUserByLogin(data.login);
+                if (!Objects.equals(user.getPassword(), data.password)) throw new RuntimeException("Invalid password");
+                var sessionId = sessionManager.createSession().getId();
+                t.getResponseHeaders().put("Set-cookie", Collections.singletonList("sessionId=" + sessionId));
+                t.sendResponseHeaders(200, -1);
+                t.close();
             } catch (RuntimeException | SQLException e) {
                 t.sendResponseHeaders(400, 0);
+                t.close();
             }
 
 //            TextMessage response = new TextMessage();
