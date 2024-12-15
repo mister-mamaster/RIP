@@ -1,4 +1,4 @@
-package org.example.Lab2;
+package org.example.Lab2.parsers;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -6,8 +6,9 @@ import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.example.Lab2.parsers.Parser;
 
-public class ParamsParser implements Parser<Map<String, Object>, String>{
+public class ParamsParser implements Parser<Map<String, Object>, String> {
     @Override
     public Map<String, Object> parse(String rawString) {
         String[] params = rawString.split("&");
