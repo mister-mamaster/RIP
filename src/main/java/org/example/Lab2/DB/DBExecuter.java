@@ -2,7 +2,7 @@ package org.example.Lab2.DB;
 
 import java.sql.ResultSet;
 
-public interface BDExecuter {
+public interface DBExecuter {
 
     public ResultSet executeQuery(String query);
 

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Mediator implements BDConnector, BDExecuter{
+public class Mediator implements DBConnector, DBExecuter {
 
     private Connection connection = null;
     @Override
