@@ -11,7 +11,7 @@ public class App
 {
     public static void main( String[] args ) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8095), 0);
-        ServerInitializer initializer = new DefaultServerInitializer();
+        ServerInitializer initializer = new ThirdLabInitializer();
         initializer.initialize(server);
         server.start();
         System.out.println("Server is ready!");
