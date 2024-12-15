@@ -18,8 +18,8 @@ public class DBUtil {
     }
 
     private static User parseUser(ResultSet rs) throws SQLException {
-        return new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"),
-                rs.getString("password"), rs.getString("login"));
+        return new User(rs.getLong("id"), rs.getString("name"), rs.getString("email"),
+                rs.getString("login"), rs.getString("password"));
     }
 
     private static User getUser(String queryAddition) throws SQLException {
@@ -27,7 +27,6 @@ public class DBUtil {
         var resultSet = mediator.executeQuery("SELECT * FROM \"Users\" WHERE " + queryAddition);
         destroyMediator(mediator);
         if(resultSet == null) throw new SQLException("User not found");
-        resultSet.next();
         return parseUser(resultSet);
     }
 
