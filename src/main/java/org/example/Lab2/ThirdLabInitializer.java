@@ -1,5 +1,9 @@
 package org.example.Lab2;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -41,7 +45,7 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
 
     static class AuthHandler implements HttpHandler {
 
-        private SessionManager sessionManager;
+        private final SessionManager sessionManager;
 
         public AuthHandler(SessionManager sessionManager) {
             this.sessionManager = sessionManager;
@@ -53,7 +57,7 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
                 RegistrationData data = new AuthParser().parse(t.getRequestBody());
                 var user = DBUtil.getUserByLogin(data.login);
                 if (!Objects.equals(user.getPassword(), data.password)) throw new RuntimeException("Invalid password");
-                var sessionId = sessionManager.createSession().getId();
+                var sessionId = sessionManager.createSession(user).getId();
                 t.getResponseHeaders().put("Set-cookie", Collections.singletonList("sessionId=" + sessionId));
                 t.sendResponseHeaders(200, -1);
                 t.close();
@@ -61,18 +65,36 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
                 t.sendResponseHeaders(400, 0);
                 t.close();
             }
+        }
+    }
 
-//            TextMessage response = new TextMessage();
-//            try {
-//                response.formResponse("ping ".repeat((Integer) ParamsParser.parse(t).get("number")));
-//            } catch (NullPointerException e) {
-//                response.formResponse("ping");
-//                e.printStackTrace();
-//            }
-//            t.sendResponseHeaders(200, response.getTextOfResponse().length());
-//            OutputStream os = t.getResponseBody();
-//            response.writeResponse(os);
-//            os.close();
+    static class WelcomeHandler implements HttpHandler {
+
+        private final SessionManager sessionManager;
+        private static final ObjectMapper mapper = new ObjectMapper();
+        private static final ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+
+        public WelcomeHandler(SessionManager sessionManager) {
+            this.sessionManager = sessionManager;
+        }
+
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            try {
+                if(!t.getRequestHeaders().containsKey("Cookie-set")) {
+                    throw new RuntimeException();
+                }
+                var user = sessionManager.getUser(t.getRequestHeaders().get("Cookie-set").get(0));
+                t.sendResponseHeaders(200, user.getName().length());
+                OutputStream os = t.getResponseBody();
+                ObjectNode json = mapper.createObjectNode();
+                json.put("userName", user.getName());
+                writer.writeValue(os, json);
+                os.close();
+                t.close();
+            } catch (RuntimeException e) {
+                t.sendResponseHeaders(401, 0);
+            }
         }
     }
 }
