@@ -18,8 +18,8 @@ public class DBUtil {
     }
 
     private static User parseUser(ResultSet rs) throws SQLException {
-        return new User(rs.getLong("id"), rs.getString("name"), rs.getString("email"),
-                rs.getString("login"), rs.getString("password"));
+        return new User(rs.getLong("id"), rs.getString("name"), rs.getString("password"),
+                rs.getString("login"), rs.getString("email"));
     }
 
     private static User getUser(String queryAddition) throws SQLException {
