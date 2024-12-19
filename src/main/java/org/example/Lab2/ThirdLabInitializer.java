@@ -28,6 +28,7 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
         super.initialize(server);
         server.createContext("/auth", new AuthHandler(this.sessionManager));
         server.createContext("/regist", new RegistHandler());
+        server.createContext("/welcome", new WelcomeHandler(this.sessionManager));
     }
 
     static class RegistHandler implements HttpHandler {
@@ -81,15 +82,16 @@ public class ThirdLabInitializer extends DefaultServerInitializer {
         @Override
         public void handle(HttpExchange t) throws IOException {
             try {
-                if(!t.getRequestHeaders().containsKey("Cookie-set")) {
+                if(!t.getRequestHeaders().containsKey("Cookie")) {
                     throw new RuntimeException();
                 }
-                var user = sessionManager.getUser(t.getRequestHeaders().get("Cookie-set").get(0));
-                t.sendResponseHeaders(200, user.getName().length());
+                var user = sessionManager.getUser(t.getRequestHeaders().get("Cookie").get(0).replaceFirst("sessionId=", ""));
+                t.getResponseHeaders().put("Content-Type", Collections.singletonList("application/json"));
                 OutputStream os = t.getResponseBody();
                 ObjectNode json = mapper.createObjectNode();
                 json.put("userName", user.getName());
-                writer.writeValue(os, json);
+                t.sendResponseHeaders(200, mapper.writeValueAsBytes(json).length);
+                os.write(mapper.writeValueAsBytes(json));
                 os.close();
                 t.close();
             } catch (RuntimeException e) {
